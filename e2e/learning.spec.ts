@@ -40,6 +40,7 @@ test('왕 → 사건 → 상세, 검색, 마인드맵, 퀴즈와 기록이 동�
  await page.screenshot({path:testInfo.outputPath('mindmap.png'),fullPage:true});
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBeTruthy();
  await page.getByRole('button',{name:'역사 퀴즈',exact:true}).click();
+ await page.getByRole('button',{name:'짧은 역사 퀴즈',exact:true}).click();
  await page.getByRole('button',{name:'2. 1446년',exact:true}).click();
  await expect(page.getByRole('button',{name:'오답 복습 (1)'})).toBeVisible();
  await page.getByRole('button',{name:'오답 복습 (1)'}).click();
