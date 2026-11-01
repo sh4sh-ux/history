@@ -6,7 +6,7 @@ type Props = { kingId: number; onOpen: (event: HistoryEvent) => void };
 export function SuccessionStory({ kingId, onOpen }: Props) {
   const story = successions[kingId];
   if (!story) return null;
-  return <section className="succession-story" aria-label="왕위 계승 이야기">
+  return <section key={kingId} className="succession-story" aria-label="왕위 계승 이야기">
     <div className="succession-title"><Crown size={19}/><span className="eyebrow">왕이 되기 전부터, 즉위한 뒤까지</span></div>
     <h3>{story.title}</h3>{story.method&&<span className="succession-method">{story.method}</span>}
     <p className="succession-summary">{story.summary}</p>
@@ -15,7 +15,7 @@ export function SuccessionStory({ kingId, onOpen }: Props) {
     </div>)}</div>
     <p className="succession-people">관련 인물 · {story.people?.join(' · ')}</p>
     <h4>시간 순서로 따라가 봐요</h4>
-    <ol className="succession-timeline">{story.milestones.map(step => <li key={step.year}>
+    <ol className="succession-timeline">{story.milestones.map(step => <li key={`${step.year}-${step.title}`}>
       <time>{step.year}년</time><div><h5>{step.title}</h5><p>{step.description}</p>
       <div className="succession-links"><a href={step.source.url} target="_blank" rel="noreferrer" aria-label={`${step.year}년 ${step.title} 출처`}>근거 자료 <ArrowUpRight size={12}/></a>
       {step.event && <button onClick={() => onOpen(events.find(event => event.id === step.event)!)}>사건 상세 읽기 <ArrowUpRight size={13}/></button>}</div></div>
