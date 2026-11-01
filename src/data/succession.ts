@@ -79,7 +79,7 @@ function account(data: Account): Succession {
     '강제 황위 계승': {hanja:'强制退位',chars:['强|강|강할','制|제|억제할','退|퇴|물러날','位|위|자리'],meaning:'압박으로 임금의 자리에서 물러나게 한다는 뜻이에요. 순종의 즉위는 고종의 강제 퇴위와 연결되어 있어요.'},
   };
   return {
-    title:`${data.name}의 왕위 계승은 어떻게 이루어졌을까요?`,
+    title:`${data.name}${(data.name.charCodeAt(data.name.length-1)-0xAC00)%28?'은':'는'} 어떻게 ${data.name==='순종'?'황제가':'왕이'} 되었을까요?`,
     summary:data.summary,method:data.method,source,term:terms[data.method] || {hanja:'卽位',chars:['卽|즉|곧·나아갈','位|위|자리'],meaning:'임금의 자리에 오른다는 뜻이에요. 왕의 아들뿐 아니라 동생이나 다른 왕족이 선택되기도 했어요.'},
     relationships:data.relations.map(([label,name,explanation])=>({label,name,explanation})),
     milestones:data.milestones.map(([year,title,description])=>({year,title,description,source})),

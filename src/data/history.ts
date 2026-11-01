@@ -1,9 +1,10 @@
+import {easyStories} from './easy-history';
 import {successions} from './succession';
 export type King = {id:number;name:string;personal:string;hanja:string;start:number;end:number;era:number;tag:string;summary:string};
 const rows = [
 ['태조','이성계','太祖',1392,1398,'새 나라의 시작','고려의 장군에서 조선의 첫 번째 왕으로. 새로운 나라의 기틀을 세웠어요.'],['정종','이방과','定宗',1398,1400,'변화의 한가운데','왕위를 둘러싼 갈등 속에서 두 번째 왕이 되었어요.'],['태종','이방원','太宗',1400,1418,'나라의 기틀을 다지다','왕의 힘을 키우고 나라의 제도를 정비했어요.'],['세종','이도','世宗',1418,1450,'백성을 위한 지혜','훈민정음과 과학, 문화가 꽃피운 시대예요.'],['문종','이향','文宗',1450,1452],['단종','이홍위','端宗',1452,1455],['세조','이유','世祖',1455,1468],['예종','이황','睿宗',1468,1469],['성종','이혈','成宗',1469,1494],['연산군','이융','燕山君',1494,1506],['중종','이역','中宗',1506,1544],['인종','이호','仁宗',1544,1545],['명종','이환','明宗',1545,1567],['선조','이연','宣祖',1567,1608],['광해군','이혼','光海君',1608,1623],['인조','이종','仁祖',1623,1649],['효종','이호','孝宗',1649,1659],['현종','이연','顯宗',1659,1674],['숙종','이순','肅宗',1674,1720],['경종','이윤','景宗',1720,1724],['영조','이금','英祖',1724,1776],['정조','이산','正祖',1776,1800,'위기를 넘어 왕이 되다','사도세자의 아들 이산은 할아버지 영조의 뒤를 이어 왕이 되었어요. 왕위 계승의 어려움과 즉위 초의 변화를 함께 살펴봐요.'],['순조','이공','純祖',1800,1834],['헌종','이환','憲宗',1834,1849],['철종','이변','哲宗',1849,1863],['고종','이희','高宗',1863,1907],['순종','이척','純宗',1907,1910]
 ];
-export const kings:King[]=rows.map((r,i)=>({id:i+1,name:String(r[0]),personal:String(r[1]),hanja:String(r[2]),start:Number(r[3]),end:Number(r[4]),era:i<9?0:i<14?1:i<20?2:3,tag:String(r[5]||successions[i+1]?.method||'왕위 계승'),summary:String(r[6]||successions[i+1]?.summary||'')}));
+export const kings:King[]=rows.map((r,i)=>({id:i+1,name:String(r[0]),personal:String(r[1]),hanja:String(r[2]),start:Number(r[3]),end:Number(r[4]),era:i<9?0:i<14?1:i<20?2:3,tag:String(r[5]||successions[i+1]?.method||'왕위 계승'),summary:easyStories[i+1]?`${easyStories[i+1].who} ${easyStories[i+1].why}`:String(r[6]||successions[i+1]?.summary||'')}));
 export const eras=[{name:'나라를 세우다',range:'1392–1494',label:'조선 전기'},{name:'변화와 시련',range:'1494–1623',label:'조선 중기'},{name:'다시 일어서다',range:'1623–1724',label:'조선 후기'},{name:'새로운 세상을 향해',range:'1724–1910',label:'조선 말기'}];
 export type HistoryEvent={id:string;king:number;year:number;title:string;hanja:string;chars:string[];meaning:string;intro:string;background:string;people:string[];steps:string[];result:string;analogy:string;story:string;source:{title:string;url:string};related:string[]};
 const coreEvents:HistoryEvent[]=[
@@ -28,7 +29,7 @@ const successionEvents: HistoryEvent[] = kings.filter(king => king.id !== 22).ma
     id:nextId(king.id),king:king.id,year:king.start,
     title:`${king.name} ${king.id===1?'건국과 즉위':king.id===27?'황제 즉위':'왕위 계승'}`,
     hanja:term.hanja,chars:term.chars,meaning:term.meaning,
-    intro:account.summary,
+    intro:`${easyStories[king.id].who} ${easyStories[king.id].why}`,
     background:account.relationships.map(person=>`${person.label}: ${person.name}. ${person.explanation}`).join(' '),
     people:account.people!,
     steps:account.milestones.map(step=>`${step.year}년 · ${step.title}. ${step.description}`),

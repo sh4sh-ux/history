@@ -85,9 +85,10 @@ test('27대 왕 모두 계승 이야기·질문·사건 상세를 제공한다',
   const account=page.getByRole('region',{name:'왕위 계승 이야기'});
   await expect(account).toBeVisible();
   await expect(account.locator('.succession-timeline li')).toHaveCount(id===22?6:4);
-  const question=account.locator('summary').first();
+  const question=account.locator('.succession-questions summary').first();
   await question.click();
-  await expect(account.locator('details').first()).toHaveAttribute('open','');
+  await expect(account.locator('.succession-questions details').first()).toHaveAttribute('open','');
+  await expect(account.getByRole('region',{name:'처음 읽는 세 단계 안내'})).toBeVisible();
   const card=page.locator('#king-content .event-card').first();
   await card.click();
   const dialog=page.getByRole('dialog');
