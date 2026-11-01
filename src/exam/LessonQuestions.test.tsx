@@ -30,7 +30,7 @@ describe('강의와 실제 기출 연결',()=>{
     const title=within(region).getByText('왕세자 이방석과 제1차 왕자의 난',{selector:'strong'});
     fireEvent.click(title.closest('summary')!);
     const card=title.closest('details')!;
-    expect(within(card).getByRole('link',{name:/제75회 심화 19번 원문/})).toHaveAttribute('href','https://www.comcbt.com/cbt/problem/16523/19/');
+    expect(within(card).getByRole('link',{name:/제75회 심화 19번 원문 출처/})).toHaveAttribute('href','https://www.comcbt.com/cbt/problem/16523/19/');
     expect(card).toHaveTextContent('정종이 왕이 된 배경');
     fireEvent.click(within(card).getByText('정답과 쉬운 해설 보기',{selector:'summary'}));
     expect(within(card).getByText('정답 1번')).toBeVisible();
@@ -41,7 +41,7 @@ describe('강의와 실제 기출 연결',()=>{
     fireEvent.click(screen.getByRole('button',{name:'기출 복습 (1)'}));
     expect(screen.getByText('왕세자 이방석과 제1차 왕자의 난',{selector:'strong'})).toBeVisible();
   });
-  it('읽은 이야기만 모으고 원문이 아닌 연결 안내라는 점을 표시한다',()=>{
+  it('읽은 이야기만 모으고 자료 요약과 기출 보기를 앱에 표시한다',()=>{
     render(<App/>);fireEvent.click(screen.getByRole('button',{name:'역사 퀴즈'}));
     expect(screen.getByText('이야기를 먼저 펼쳐 보세요')).toBeVisible();
     fireEvent.click(screen.getByRole('button',{name:'왕조 연표에서 배우기'}));
@@ -55,7 +55,7 @@ describe('강의와 실제 기출 연결',()=>{
     expect(region).toHaveTextContent('읽은 이야기 1개와 연결된 기출');
     expect(region.querySelectorAll('.lesson-question')).toHaveLength(1);
     fireEvent.click(within(region).getByText('훈민정음의 주인공 세종과 칠정산',{selector:'strong'}).closest('summary')!);
-    expect(within(region).getByText(/문제 지문·그림·보기는 원문 링크에서 확인/)).toBeVisible();
+    expect(within(region).getByText(/원문 자료를 쉬운 말로 요약했어요/)).toBeVisible();
   });
   it('왕별 찾기·미등록 안내·복습 복원과 정답 처리 후 오답 제거가 작동한다',()=>{
     localStorage.setItem(LESSON_KEY,JSON.stringify({'70-advanced-24':'review'}));

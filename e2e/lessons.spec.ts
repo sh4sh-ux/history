@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test';
 
-test('강의별 기출 펼치기, 원문 링크, 읽은 강의 연결과 복습 저장이 작동한다',async({page},testInfo)=>{
+test('강의별 기출 펼치기, 문제 표시와 원문 링크, 읽은 강의 연결과 복습 저장이 작동한다',async({page},testInfo)=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('');
   await page.getByRole('combobox',{name:'왕 바로 선택'}).selectOption('2');
@@ -8,8 +8,12 @@ test('강의별 기출 펼치기, 원문 링크, 읽은 강의 연결과 복습 
   const card=related.locator('.lesson-question').filter({hasText:'제75회 심화 19번'});
   await card.locator(':scope > summary').click();
   await expect(card).toContainText('정종이 왕이 된 배경');
-  await expect(card.getByRole('link',{name:/제75회 심화 19번 원문/})).toHaveAttribute('href','https://www.comcbt.com/cbt/problem/16523/19/');
-  await expect(card.getByRole('link',{name:/원문 문제 보기/})).toHaveAttribute('target','_blank');
+  await expect(card.getByRole('heading',{name:'19. 다음 자료를 활용한 탐구 활동으로 가장 적절한 것은?',exact:true})).toBeVisible();
+  await expect(card.locator('.material-summary')).toContainText('막내아들 이방석');
+  await expect(card.getByRole('radio')).toHaveCount(5);
+  await expect(card.getByText('제1차 왕자의 난이 일어난 이유를 찾아본다.',{exact:true})).toBeVisible();
+  await expect(card.getByRole('link',{name:/제75회 심화 19번 원문 출처/})).toHaveAttribute('href','https://www.comcbt.com/cbt/problem/16523/19/');
+  await expect(card.getByRole('link',{name:/원문 출처 확인/})).toHaveAttribute('target','_blank');
   await card.getByText('막히면 힌트 보기',{exact:true}).click();
   await expect(card.getByText('이방석의 세자 책봉이 다른 왕자들에게 어떤 영향을 주었을까요?',{exact:true})).toBeVisible();
   await card.getByText('정답과 쉬운 해설 보기',{exact:true}).click();
@@ -29,7 +33,7 @@ test('강의별 기출 펼치기, 원문 링크, 읽은 강의 연결과 복습 
   await page.getByRole('button',{name:'왕별로 찾기',exact:true}).click();
   await page.getByRole('combobox',{name:'기출 연결 왕 선택'}).selectOption('22');
   await page.locator('.lesson-question > summary').click();
-  await expect(page.getByRole('link',{name:/제70회 심화 24번 원문/})).toHaveAttribute('href','https://www.comcbt.com/cbt/problem/16227/24/');
+  await expect(page.getByRole('link',{name:/제70회 심화 24번 원문 출처/})).toHaveAttribute('href','https://www.comcbt.com/cbt/problem/16227/24/');
   await page.getByRole('button',{name:'규장각 설치',exact:true}).click();
   const dialog=page.getByRole('dialog');
   await expect(dialog.getByRole('heading',{name:'규장각 설치',exact:true})).toBeVisible();
@@ -42,4 +46,43 @@ test('강의별 기출 펼치기, 원문 링크, 읽은 강의 연결과 복습 
   await page.getByRole('region',{name:'강의별 한능검 기출'}).screenshot({path:testInfo.outputPath('learned-lessons-past.png')});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
   expect(errors).toEqual([]);
+});
+
+test('오프라인에서도 12문항의 지문·보기를 읽고 채점·복원하며 이미지 실패를 안내한다',async({page,context},testInfo)=>{
+  test.setTimeout(90000);
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('');
+  await page.evaluate(async()=>{await navigator.serviceWorker.ready});
+  await expect.poll(()=>page.evaluate(()=>Boolean(navigator.serviceWorker.controller))).toBeTruthy();
+  await context.setOffline(true);
+  await page.getByRole('button',{name:'역사 퀴즈',exact:true}).click();
+  await page.getByRole('button',{name:'전체 연결 기출',exact:true}).click();
+  const cards=page.locator('.lesson-question');await expect(cards).toHaveCount(12);
+  for(let i=0;i<12;i++){
+    const card=cards.nth(i);await card.locator(':scope > summary').click();
+    await expect(card.locator('.inline-question h4')).toBeVisible();
+    await expect(card.locator('.material-summary p')).toBeVisible();
+    await expect(card.getByRole('radio')).toHaveCount(5);
+    await expect(card.getByRole('button',{name:'정답 확인하기',exact:true})).toBeDisabled();
+  }
+  const card=cards.first();
+  await card.getByRole('radio',{name:'제75회 심화 19번 2번',exact:true}).check();
+  await card.getByRole('button',{name:'정답 확인하기',exact:true}).click();
+  await expect(card.locator('.inline-feedback')).toContainText('다시 살펴봐요. 정답은 1번이에요.');
+  await expect(page.getByRole('button',{name:'기출 복습 (1)',exact:true})).toBeVisible();
+  await card.getByText('시험지 원본 자료도 보기',{exact:true}).click();
+  await expect(card.locator('.original-material')).toContainText('원본 이미지를 불러오지 못했어요');
+  await expect(card.locator('.material-summary p')).toBeVisible();
+  await expect(card.getByRole('radio')).toHaveCount(5);
+  await card.screenshot({path:testInfo.outputPath('offline-inline-question.png')});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+  await page.reload();await page.getByRole('button',{name:'역사 퀴즈',exact:true}).click();
+  await page.getByRole('button',{name:'기출 복습 (1)',exact:true}).click();
+  await page.locator('.lesson-question > summary').click();
+  await expect(page.getByRole('radio',{name:'제75회 심화 19번 2번',exact:true})).toBeChecked();
+  await expect(page.locator('.inline-feedback')).toContainText('다시 살펴봐요');
+  await page.getByRole('radio',{name:'제75회 심화 19번 1번',exact:true}).check();
+  await page.getByRole('button',{name:'정답 확인하기',exact:true}).click();
+  await expect(page.getByText(/아직 복습할 기출이 없어요/)).toBeVisible();
+  await context.setOffline(false);expect(errors).toEqual([]);
 });
