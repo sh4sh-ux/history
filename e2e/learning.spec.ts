@@ -74,3 +74,37 @@ test('PWA 파일과 오프라인 재방문이 작동한다',async ({page,context
  await expect(page.getByRole('dialog')).toBeVisible();
  await context.setOffline(false);
 });
+
+
+test('27대 왕 모두 계승 이야기·질문·사건 상세를 제공한다',async ({page},testInfo)=>{
+ test.setTimeout(90000);
+ await page.goto('');
+ const selector=page.getByRole('combobox',{name:'왕 바로 선택'});
+ for(let id=1;id<=27;id++){
+  await selector.selectOption(String(id));
+  const account=page.getByRole('region',{name:'왕위 계승 이야기'});
+  await expect(account).toBeVisible();
+  await expect(account.locator('.succession-timeline li')).toHaveCount(id===22?6:4);
+  const question=account.locator('summary').first();
+  await question.click();
+  await expect(account.locator('details').first()).toHaveAttribute('open','');
+  const card=page.locator('#king-content .event-card').first();
+  await card.click();
+  const dialog=page.getByRole('dialog');
+  await expect(dialog.getByText('이야기는 이렇게 흘러갔어요')).toBeVisible();
+  await expect(dialog.locator('.source a')).toHaveAttribute('href',/^https:\/\//);
+  await dialog.getByRole('button',{name:'상세 닫기'}).click();
+ }
+ await selector.selectOption('2');
+ await expect(page.getByRole('region',{name:'왕위 계승 이야기'})).toContainText('1399');
+ await page.screenshot({path:testInfo.outputPath('jeongjong-succession.png'),fullPage:true});
+ await selector.selectOption('22');
+ const jeongjo=page.getByRole('region',{name:'왕위 계승 이야기'});
+ await expect(jeongjo).toContainText('효장세자');
+ await jeongjo.getByText('효장세자가 정조를 직접 키운 것인가요?',{exact:true}).click();
+ await expect(jeongjo).toContainText('정조가 태어나기 전에 세상을 떠났어요');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBeTruthy();
+ await page.screenshot({path:testInfo.outputPath('jeongjo-succession.png'),fullPage:true});
+ await page.getByRole('button',{name:'역사 마인드맵',exact:true}).click();
+ await expect(page.getByRole('region',{name:'역사 마인드맵'})).toContainText('정조는 어떻게 왕이 되었을까요?');
+});

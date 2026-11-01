@@ -1,3 +1,4 @@
+import {SuccessionStory} from './SuccessionStory';
 import { ArrowUpRight, BookOpen, GitBranch } from 'lucide-react';
 import { events, kings, type HistoryEvent, type King } from './data/history';
 
@@ -38,6 +39,7 @@ export function MindMap({ selected, onSelect, onOpen, read }: Props) {
           {!stories.length && <div className="map-empty"><BookOpen size={22}/><p>이 왕의 상세 이야기는 준비 중이에요.</p><button className="text-button" onClick={() => onSelect(4)}>세종 이야기 보기 <ArrowUpRight size={14}/></button></div>}
         </div>
       </div>
+      <SuccessionStory kingId={selected.id} onOpen={onOpen}/>
       <p className="muted">연결선은 학습 순서를 나타내요. 사건 사이의 관계는 상세 화면의 ‘이어지는 사건’에서 살펴보세요.</p>
     </section>
   );
