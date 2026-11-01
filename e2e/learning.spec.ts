@@ -6,10 +6,11 @@ test('왕 → 사건 → 상세, 검색, 마인드맵, 퀴즈와 기록이 동�
  await page.goto('');
  await expect(page.getByRole('heading',{name:'한눈에 보는 조선왕조'})).toBeVisible();
  await expect(page.locator('.king')).toHaveCount(27);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBeTruthy();
  await page.screenshot({path:testInfo.outputPath('timeline.png'),fullPage:true});
  for(const king of [
   {name:'태조',id:1,title:'조선 건국',hanja:'朝鮮建國'},
-  {name:'정종',id:2,title:'제2차 왕자의 난',hanja:'王子之亂'},
+  {name:'정종',id:2,title:'제2차 왕자의 난',hanja:'王子의亂'},
   {name:'태종',id:3,title:'계미자 제작',hanja:'癸未字'},
   {name:'세종',id:4,title:'훈민정음 반포',hanja:'訓民正音'},
  ]){
@@ -22,7 +23,8 @@ test('왕 → 사건 → 상세, 검색, 마인드맵, 퀴즈와 기록이 동�
   await expect(dialog.getByText('어떤 시대였을까요?')).toBeVisible();
   if(king.id===4){
    await dialog.getByRole('button',{name:'책갈피 저장'}).click();
-   await page.screenshot({path:testInfo.outputPath('event-detail.png'),fullPage:true});
+   await expect(dialog).toBeInViewport();
+   await page.screenshot({path:testInfo.outputPath('event-detail.png')});
   }
   await dialog.getByRole('button',{name:'상세 닫기'}).click();
  }
@@ -36,6 +38,7 @@ test('왕 → 사건 → 상세, 검색, 마인드맵, 퀴즈와 기록이 동�
  await expect(page.getByRole('dialog')).toBeVisible();
  await page.getByRole('button',{name:'상세 닫기'}).click();
  await page.screenshot({path:testInfo.outputPath('mindmap.png'),fullPage:true});
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBeTruthy();
  await page.getByRole('button',{name:'역사 퀴즈',exact:true}).click();
  await page.getByRole('button',{name:'2. 1446년',exact:true}).click();
  await expect(page.getByRole('button',{name:'오답 복습 (1)'})).toBeVisible();

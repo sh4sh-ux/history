@@ -2,6 +2,7 @@
 React + TypeScript + Vite로 만든 서버 없는 역사 학습 PWA. 운영에 유료 API나 계정이 필요하지 않습니다.
 
 ## 실행
+Node.js 22.12 이상(22 LTS 또는 24 LTS)을 사용합니다.
 ```sh
 npm ci
 npm run dev
